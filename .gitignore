@@ -1,0 +1,41 @@
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+
+# --- IDE/editor ---
+.vscode/
+.idea/
+*.code-workspace
+
+# --- Logs & temp/cache ---
+*.log
+*.tmp
+cache/
+tmp/
+
+# --- Composer (if you add it later) ---
+vendor/
+
+# --- Node (if you add front-end tooling) ---
+node_modules/
+
+# --- Uploads & generated images ---
+uploads/
+!uploads/.gitkeep
+
+# --- Env & secrets ---
+config.php
+.env
+.env.*
+
+# --- PHP sessions or misc artifacts ---
+*.sess
+
+# --- Archives/Backups ---
+*.zip
+*.tar
+*.tar.gz
+
+# --- DB dumps (keep your seed file) ---
+*.sql
+!database_setup.sql
