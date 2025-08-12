@@ -1,5 +1,5 @@
 <?php
-// ⭐ captcha.php 
+//captcha.php 
 
 session_start();
 

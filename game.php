@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_comment'])) {
         } elseif (strlen($comment) > 1000) {
             $comment_error = 'Comment is too long (max 1000 characters).';
         } else {
-            // ⭐ Check image CAPTCHA if not admin
+            //  Check image CAPTCHA if not admin
             if (!is_admin()) {
                 $captcha_input = isset($_POST['captcha_code']) ? strtoupper(trim($_POST['captcha_code'])) : '';
                 $expected_captcha = isset($_SESSION['captcha_code']) ? strtoupper($_SESSION['captcha_code']) : '';
@@ -224,7 +224,7 @@ $comments = $comments_stmt->fetchAll();
                                     <div class="form-text">Maximum 1000 characters</div>
                                 </div>
                                 
-                                <!-- ⭐ Image CAPTCHA for non-admin users -->
+                                <!--  Image CAPTCHA for non-admin users -->
                                 <?php if (!is_admin()): ?>
                                     <div class="mb-3">
                                         <label class="form-label">Human Verification</label>
@@ -374,7 +374,7 @@ $comments = $comments_stmt->fetchAll();
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // ⭐ Refresh CAPTCHA image
+        //  Refresh CAPTCHA image
         function refreshCaptcha() {
             const captchaImg = document.getElementById('captcha-image');
             captchaImg.src = 'captcha.php?' + Math.random();
