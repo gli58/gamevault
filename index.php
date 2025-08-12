@@ -11,6 +11,8 @@ $allowed_sorts = ['title', 'created_at', 'updated_at', 'rating'];
 if (!in_array($sort, $allowed_sorts)) {
     $sort = 'created_at';
 }
+// NEW: decide sort direction (title A→Z, others newest/highest first)
+$direction = ($sort === 'title') ? 'ASC' : 'DESC';
 
 // Pagination
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -45,7 +47,7 @@ $sql = "SELECT g.*, c.name as category_name
         FROM games g 
         LEFT JOIN categories c ON g.category_id = c.id 
         $where_clause 
-        ORDER BY g.$sort DESC 
+        ORDER BY g.$sort $direction
         LIMIT :offset, :per_page";
 
 $stmt = $pdo->prepare($sql);
@@ -135,7 +137,7 @@ $categories = $pdo->query($categories_sql)->fetchAll();
             <?php if (is_admin()): ?>
                 <a href="admin/dashboard.php" class="nav-btn me-1">Dashboard</a>
             <?php endif; ?>
-            <span class="me-2 text-light">Hi, <?= htmlspecialchars($_SESSION['username']) ?></span>
+            <span class="me-2 text-light">Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
             <a href="auth/logout.php" class="nav-btn">Logout</a>
         <?php else: ?>
             <a href="auth/login.php" class="nav-btn me-1">Login</a>
