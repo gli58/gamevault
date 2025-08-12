@@ -135,7 +135,7 @@ $categories = $pdo->query($categories_sql)->fetchAll();
     <div class="admin-link" style="top: 50px; opacity: 1;">
         <?php if (is_logged_in()): ?>
             <?php if (is_admin()): ?>
-                <a href="admin/dashboard.php" class="nav-btn me-1">Dashboard</a>
+                <a href="admin/dashboard.php" class="nav-btn me-1">Admin Panel</a>
             <?php endif; ?>
             <span class="me-2 text-light">Welcome, <?= htmlspecialchars($_SESSION['username']) ?></span>
             <a href="auth/logout.php" class="nav-btn">Logout</a>
