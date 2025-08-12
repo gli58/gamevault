@@ -37,15 +37,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_comment'])) {
         } elseif (strlen($comment) > 1000) {
             $comment_error = 'Comment is too long (max 1000 characters).';
         } else {
-            // Check CAPTCHA if not admin
+            // ⭐ Check image CAPTCHA if not admin
             if (!is_admin()) {
-                $captcha_answer = isset($_POST['captcha_answer']) ? (int)$_POST['captcha_answer'] : 0;
-                $expected_answer = isset($_SESSION['captcha_answer']) ? (int)$_SESSION['captcha_answer'] : 0;
+                $captcha_input = isset($_POST['captcha_code']) ? strtoupper(trim($_POST['captcha_code'])) : '';
+                $expected_captcha = isset($_SESSION['captcha_code']) ? strtoupper($_SESSION['captcha_code']) : '';
                 
-                if ($captcha_answer !== $expected_answer) {
+                if (empty($captcha_input) || $captcha_input !== $expected_captcha) {
                     $comment_error = 'CAPTCHA verification failed. Please try again.';
                 } else {
-                    unset($_SESSION['captcha_answer']);
+                    // Clear captcha from session after successful verification
+                    unset($_SESSION['captcha_code']);
                 }
             }
             
@@ -72,13 +73,6 @@ $comments_sql = "SELECT c.*, u.username
 $comments_stmt = $pdo->prepare($comments_sql);
 $comments_stmt->execute([':game_id' => $game_id]);
 $comments = $comments_stmt->fetchAll();
-
-// Generate CAPTCHA for non-admin users
-if (is_logged_in() && !is_admin()) {
-    $num1 = rand(1, 10);
-    $num2 = rand(1, 10);
-    $_SESSION['captcha_answer'] = $num1 + $num2;
-}
 ?>
 
 <!DOCTYPE html>
@@ -95,6 +89,17 @@ if (is_logged_in() && !is_admin()) {
         }
         .comment-card {
             border-left: 4px solid #007bff;
+        }
+        .captcha-container {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background: #f8f9fa;
+        }
+        .captcha-image {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -219,17 +224,30 @@ if (is_logged_in() && !is_admin()) {
                                     <div class="form-text">Maximum 1000 characters</div>
                                 </div>
                                 
-                                <!-- CAPTCHA for non-admin users -->
+                                <!-- ⭐ Image CAPTCHA for non-admin users -->
                                 <?php if (!is_admin()): ?>
                                     <div class="mb-3">
                                         <label class="form-label">Human Verification</label>
-                                        <div class="input-group" style="max-width: 200px;">
-                                            <span class="input-group-text">
-                                                <?= $num1 ?> + <?= $num2 ?> =
-                                            </span>
-                                            <input type="number" class="form-control" name="captcha_answer" required>
+                                        <div class="captcha-container">
+                                            <div class="row align-items-center">
+                                                <div class="col-md-6">
+                                                    <img src="captcha.php" alt="CAPTCHA" class="captcha-image mb-2" id="captcha-image" onclick="refreshCaptcha()" title="Click to refresh">
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-refresh me-1"></i>
+                                                        Click image to refresh
+                                                    </small>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <input type="text" class="form-control" name="captcha_code" 
+                                                           placeholder="Enter code from image" 
+                                                           maxlength="5" required autocomplete="off">
+                                                    <small class="form-text text-muted">
+                                                        Enter the 5-character code shown in the image
+                                                    </small>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="form-text">Please solve this simple math problem</div>
                                     </div>
                                 <?php endif; ?>
                                 
@@ -354,5 +372,18 @@ if (is_logged_in() && !is_admin()) {
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // ⭐ Refresh CAPTCHA image
+        function refreshCaptcha() {
+            const captchaImg = document.getElementById('captcha-image');
+            captchaImg.src = 'captcha.php?' + Math.random();
+        }
+        
+        // Auto-refresh CAPTCHA if form submission fails
+        <?php if (!empty($comment_error) && !is_admin()): ?>
+        refreshCaptcha();
+        <?php endif; ?>
+    </script>
 </body>
 </html>
